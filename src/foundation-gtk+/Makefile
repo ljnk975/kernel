@@ -66,6 +66,12 @@ include Rules.mk
 
 
 build:
+# ROCKS8 - bump to 3.22.30 (same as on Rocky8)
+# https://download.gnome.org/sources/gtk%2B/3.22/gtk%2B-3.22.30.tar.xz
+ifeq ($(shell ! test -f $(TARFILE) && echo -n yes),yes)
+	@echo "WARNING: Sideloading $(TARFILE)."
+	$(HTTPGET) -B https://download.gnome.org/sources/gtk%2B/3.22  -F . -n $(TARFILE)
+endif
 	unxz -c $(TARFILE) | $(TAR) xvf - 
 	(								\
 		cd $(SUBDIR) ; 						\

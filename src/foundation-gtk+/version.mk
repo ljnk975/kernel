@@ -1,6 +1,6 @@
 NAME		= foundation-gtk+
 PKGROOT		= /opt/rocks
-VERSION		= 3.16.7
+VERSION		= 3.22.30
 RELEASE		= 0
 SUBDIR		= gtk+-$(VERSION)
 TARFILE		= $(SUBDIR).tar.xz

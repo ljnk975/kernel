@@ -209,6 +209,7 @@ popd
 export PYTHON=/opt/rocks/bin/python
 export PKG_CONFIG_PATH=/opt/rocks/lib/pkgconfig:%{PKG_CONFIG_PATH}
 export LDFLAGS="-L/opt/rocks/lib"
+export LD_LIBRARY_PATH=/opt/rocks/lib
 export LIBS="-lpython2.7 -ldl -lm -lpthread -lutil /opt/rocks/lib/libssl.a /opt/rocks/lib/libcrypto.a /opt/rocks/lib/libssl.a"
 %configure --disable-static \
            --enable-introspection \
@@ -224,7 +225,7 @@ find %{buildroot} -type f -name "*.la" | xargs %{__rm}
 find %{buildroot} -type f | xargs %{__sed} -i '1 s/\/usr\/bin\/python/\/opt\/rocks\/bin\/python/'
 
 %ifarch %livearches
-desktop-file-install ---dir=%{buildroot}%{_datadir}/applications %{buildroot}%{_datadir}/applications/liveinst.desktop
+#desktop-file-install ---dir=%{buildroot}%{_datadir}/applications %{buildroot}%{_datadir}/applications/liveinst.desktop
 
 # Add a sitecustomize.py to be loaded by liveinst
 mkdir -p %{buildroot}%{_datadir}/anaconda/site-python

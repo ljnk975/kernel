@@ -1,6 +1,6 @@
 NAME		= foundation-glade
 PKGROOT		= /opt/rocks
-VERSION		= 3.19.0
+VERSION		= 3.22.1
 RELEASE		= 0
 SUBDIR		= glade-$(VERSION)
 TARFILE		= $(SUBDIR).tar.xz
