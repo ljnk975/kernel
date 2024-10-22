@@ -156,6 +156,7 @@ SRCDIRS = `find . -maxdepth 1 -type d \
 	-not -name rocks-kernel \
 	-not -name foundation-devel-module \
 	-not -name foundation-atk \
+	-not -name foundation-at-spi2-core \
 	-not -name foundation-at-spi2-atk \
 	-not -name foundation-glib2 \
 	-not -name foundation-gdk-pixbuf2 \
