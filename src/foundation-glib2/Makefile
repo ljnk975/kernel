@@ -70,22 +70,22 @@ build:
 # https://download.gnome.org/sources/glib/2.56/glib-2.56.4.tar.xz
 ifeq ($(shell ! test -f $(TARFILE) && echo -n yes),yes)
 	@echo "ROCKS8: Sideloading $(TARFILE)."
-	$(HTTPGET) -B https://download.gnome.org -F sources/glib/2.62 -n $(TARFILE)
+	$(HTTPGET) -B https://download.gnome.org -F sources/glib/2.56 -n $(TARFILE)
 endif
 	unxz -c $(TARFILE) | $(TAR) xvf - 
 	-cd patch-files && find . -type f | grep -v CVS | cpio -pduv ../
 	(								\
 		cd $(SUBDIR) ; 						\
 		PYTHON=/opt/rocks/bin/python PKG_CONFIG_PATH=/opt/rocks/lib/pkgconfig:$$PKG_CONFIG_PATH \
-		meson setup build --prefix=$(PKGROOT);			\
-		cd build; meson compile; 						\
+		./configure --prefix=$(PKGROOT);			\
+		$(MAKE); 						\
 	)
 
 install::
 	mkdir -p $(ROOT)/$(PKGROOT)
 	(								\
 		cd $(SUBDIR);						\
-		cd build; DESTDIR=$(ROOT) meson install;		\
+		$(MAKE) prefix=$(ROOT)/$(PKGROOT) install;		\
 	)
 #	( 								\
 #		for f in `find $(ROOT) -name '*py'`; do 		\

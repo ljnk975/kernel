@@ -66,36 +66,31 @@ include Rules.mk
 
 
 build:
-# ROCKS8 - bump to 3.22.30 (same as on Rocky8)
-# https://download.gnome.org/sources/gtk%2B/3.22/gtk%2B-3.22.30.tar.xz
-ifeq ($(shell ! test -f $(TARFILE) && echo -n yes),yes)
-	@echo "WARNING: Sideloading $(TARFILE)."
-	$(HTTPGET) -B https://download.gnome.org/sources/gtk%2B/3.22  -F . -n $(TARFILE)
-endif
 	unxz -c $(TARFILE) | $(TAR) xvf - 
 	(								\
 		cd $(SUBDIR) ; 						\
+		. /etc/profile.d/modules.sh;				\
+		module load opt-devel;					\
 		PKG_CONFIG_PATH=/opt/rocks/lib/pkgconfig:$$PKG_CONFIG_PATH \
+		LD_LIBRARY_PATH=/opt/rocks/lib \
 		./configure --prefix=$(PKGROOT) ;			\
 		$(MAKE) ; 						\
 	)
-#		. /etc/profile.d/modules.sh;				\
-#		module load opt-devel;					\
 
 install::
 	mkdir -p $(ROOT)/$(PKGROOT)
 	(								\
 		cd $(SUBDIR);						\
+		. /etc/profile.d/modules.sh;				\
+		module load opt-devel;					\
 		$(MAKE) prefix=$(ROOT)/$(PKGROOT) install;		\
 	)
-#		. /etc/profile.d/modules.sh;				\
-#		module load opt-devel;					\
-#	( 								\
-#		for f in `find $(ROOT) -name '*py'`; do 		\
-#			sed -i -e 's#$(ROOT)##g' $$f;			\
-#		done							\
-#	)
-	
+	( 								\
+		for f in `find $(ROOT) -name '*py'`; do 		\
+			sed -i -e 's#$(ROOT)##g' $$f;			\
+		done							\
+	)
+
 clean::
 	rm -rf $(SUBDIR)
 	rm -f $(NAME).spec.in

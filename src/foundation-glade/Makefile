@@ -66,16 +66,11 @@ include Rules.mk
 
 
 build:
-# ROCKS8 - bump to version 3.22.1 (same on Rocky8)
-# https://download.gnome.org/sources/glade/3.22/glade-3.22.1.tar.xz
-ifeq ($(shell ! test -f $(TARFILE) && echo -n yes),yes)
-	@echo "ROCKS8: Sideloading $(TARFILE)."
-	$(HTTPGET) -B https://download.gnome.org  -F sources/glade/3.22 -n $(TARFILE)
-endif
 	unxz -c $(TARFILE) | $(TAR) xvf - 
 	(								\
 		cd $(SUBDIR) ; 						\
-		export PKG_CONFIG_PATH=/opt/rocks/lib/pkgconfig:$$PKG_CONFIG_PATH; \
+		module load opt-devel;					\
+		PKG_CONFIG_PATH=/opt/rocks/lib/pkgconfig:$$PKG_CONFIG_PATH \
 		./configure --enable-glade-ui --prefix=$(PKGROOT) ;	\
 		$(MAKE) ; 						\
 	)
