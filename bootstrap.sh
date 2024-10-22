@@ -89,6 +89,8 @@ fi
 
 . $ROLLSROOT/etc/bootstrap-functions.sh || exit 1
 
+# for foundation-python-report
+install asciidoc python3-devel
 
 # prerequisites for foundation-anaconda
 compile_and_install foundation-devel-module

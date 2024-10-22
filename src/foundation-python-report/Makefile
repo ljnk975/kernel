@@ -77,9 +77,10 @@ include Rules.mk
 build:
 # ROCKS8: Creates missing python-report package for foundation-anaconda
 # https://download.rockylinux.org/pub/rocky/8/BaseOS/source/tree/Packages/l/libreport-2.9.5-15.el8.rocky.6.3.src.rpm
+# https://repo.almalinux.org/vault/9.4/BaseOS/Source/Packages/libreport-2.15.2-6.el9.alma.src.rpm
 ifeq ($(shell ! test -f $(SRCPKGNAME) && echo -n yes),yes)
 	@echo "ROCKS8: Sideloading $(SRCPKGNAME)."
-	$(HTTPGET) -B https://download.rockylinux.org -F pub/rocky/8/BaseOS/source/tree/Packages/l -n $(SRCPKGNAME)
+	$(HTTPGET) -B https://repo.almalinux.org -F vault/9.4/BaseOS/Source/Packages -n $(SRCPKGNAME)
 endif
 	(								\
 		mkdir content && cd content;				\
@@ -91,9 +92,9 @@ endif
 		for pat in $$PATCHES; do patch -p1 < $$pat; done;	\
 		./autogen.sh;						\
 		autoconf;						\
-		PYTHON=$(PY.PATH) PKG_CONFIG_PATH=/opt/rocks/lib/pkgconfig:$PKG_CONFIG_PATH \
+		PKG_CONFIG_PATH=/opt/rocks/lib/pkgconfig:$PKG_CONFIG_PATH \
 		LIBS=/opt/rocks/lib/libcurl.a				\
-		./configure --prefix=$(PKGROOT) --without-python3 --with-python2;	\
+		./configure --prefix=$(PKGROOT);	\
 		$(MAKE);						\
 	)
 
@@ -107,9 +108,10 @@ install::
 		rm -rf $(ROOT)/$(PKGROOT)/include;			\
 		rm -rf $(ROOT)/$(PKGROOT)/share;			\
 		rm -rf $(ROOT)/$(PKGROOT)/var;				\
-		rm -rf $(ROOT)/$(PKGROOT)/lib/pkgconfig;		\
-		rm -rf $(ROOT)/$(PKGROOT)/lib/lib*;			\
+		rm -rf $(ROOT)/$(PKGROOT)/lib;			\
+		mv $(ROOT)/$(PKGROOT)/lib64 $(ROOT)/$(PKGROOT)/lib;	\
+		mv $(ROOT)/$(PKGROOT)/lib/python3.9 $(ROOT)/$(PKGROOT)/lib/python2.7;	\
 	)
 
 clean::
-	rm -rf $(PYPKGNAME)-$(VERSION)
+	rm -rf libreport-$(VERSION)

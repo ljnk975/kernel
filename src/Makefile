@@ -165,7 +165,6 @@ SRCDIRS = `find . -maxdepth 1 -type d \
 	-not -name foundation-libxklavier \
 	-not -name foundation-libcroco \
 	-not -name foundation-librsvg \
-	-not -name foundation-python-report \
 	-not -name foundation-python-yum \
 	-not -name kernel.org \
 	-not -name sqlite \
