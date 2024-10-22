@@ -6,4 +6,4 @@ VERSION		= 0.6.12
 RELEASE		= 0
 SUBDIR		= libcroco-$(VERSION)
 TARFILE		= $(SUBDIR).tar.xz
-RPM.FILES	= "$(PKGROOT)/lib/*"
+RPM.FILES	= "$(PKGROOT)/lib/*\\n$(PKGROOT)/bin/*\\n$(PKGROOT)/include/*\\n$(PKGROOT)/share/*"

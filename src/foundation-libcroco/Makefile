@@ -66,18 +66,17 @@ include Rules.mk
 
 
 build:
-# ROCKS8 - required for foundation-anaconda
+# ROCKS9 - required for foundation-librsvg
 # https://download.gnome.org/sources/libcroco/0.6/libcroco-0.6.12.tar.xz
 ifeq ($(shell ! test -f $(TARFILE) && echo -n yes),yes)
-	@echo "ROCKS8: Sideloading $(TARFILE)."
+	@echo "ROCKS9: Sideloading $(TARFILE)."
 	$(HTTPGET) -B $(SRCPKGHOST) -F $(SRCPKGPATH) -n $(TARFILE)
 endif
 	unxz -c $(TARFILE) | $(TAR) xvf - 
 	(								\
 		cd $(SUBDIR) ; 						\
 		PKG_CONFIG_PATH=/opt/rocks/lib/pkgconfig:$$PKG_CONFIG_PATH	\
-		./configure --prefix=$(PKGROOT) --enable-introspection=yes	\
-		--disable-vala --disable-static;			\
+		./configure --prefix=$(PKGROOT);			\
 		$(MAKE); 						\
 	)
 
@@ -86,13 +85,6 @@ install::
 	(								\
 		cd $(SUBDIR);						\
 		$(MAKE) prefix=$(ROOT)/$(PKGROOT) install;		\
-		rm -rf $(ROOT)/$(PKGROOT)/bin;				\
-		rm -rf $(ROOT)/$(PKGROOT)/include;			\
-		rm -rf $(ROOT)/$(PKGROOT)/lib/*.so;			\
-		rm -rf $(ROOT)/$(PKGROOT)/lib/pkgconfig;		\
-		rm -rf $(ROOT)/$(PKGROOT)/share/gir-1.0;		\
-		rm -rf $(ROOT)/$(PKGROOT)/share/gtk-doc;		\
-		rm -rf $(ROOT)/$(PKGROOT)/share/man;			\
 	)
 
 clean::
