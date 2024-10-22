@@ -28,13 +28,11 @@ symlink /lib/systemd/system/anaconda.target etc/systemd/system/default.target
 mkdir etc/systemd/system/local-fs.target.wants/
 symlink /lib/systemd/system/tmp.mount etc/systemd/system/local-fs.target.wants/tmp.mount
 
-## Start rngd
-mkdir etc/systemd/system/basic.target.wants/
-symlink /lib/systemd/system/rngd.service etc/systemd/system/basic.target.wants/rngd.service
-
 ## Disable unwanted systemd services
 systemctl disable systemd-readahead-collect.service \
                   systemd-readahead-replay.service \
+                  mdmonitor.service \
+                  mdmonitor-takeover.service \
                   lvm2-monitor.service \
                   dnf-makecache.timer
 ## These services can't be disabled normally (they're linked into place in
@@ -74,7 +72,6 @@ mkdir etc/NetworkManager/conf.d
 install ${configdir}/91-anaconda-autoconnect-slaves.conf etc/NetworkManager/conf.d
 install ${configdir}/vconsole.conf etc
 install ${configdir}/92-anaconda-loglevel-debug.conf etc/NetworkManager/conf.d
-install ${configdir}/90-anaconda-no-auto-default.conf etc/NetworkManager/conf.d
 
 ## set up sshd
 install ${configdir}/sshd_config.anaconda etc/ssh
@@ -114,6 +111,10 @@ remove etc/lvm/cache/*
 remove etc/lvm/cache
 remove etc/lvm/lvm.conf
 append etc/lvm/lvm.conf "global {\n\tuse_lvmetad = 1\n}\n"
+
+## Remove machine specific nvme-cli files
+remove etc/nvme/hostid
+remove etc/nvme/hostnqn
 
 ## Record the package versions used to create the image
 ## rpm initializes nss, which requires /dev/urandom to be present, hence the mknod
