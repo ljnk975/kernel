@@ -1,0 +1,12 @@
+diff -ru org/Makefile patch/Makefile
+--- org/Makefile	2024-10-22 23:25:31.722252103 +0700
++++ patch/Makefile	2024-10-22 23:27:42.421288455 +0700
+@@ -7,7 +7,7 @@
+ VERSION=$(shell awk '/Version:/ { print $$2 }' ${PKGNAME}.spec)
+ RELEASE=$(shell awk '/Release:/ { print $$2 }' ${PKGNAME}.spec)
+ CVSTAG=yum-$(subst .,_,$(VERSION)-$(RELEASE))
+-PYTHON=python
++PYTHON=/opt/rocks/bin/python
+ WEBHOST = yum.baseurl.org
+ WEB_DOC_PATH = /srv/projects/yum/web/download/docs/yum-api/
+ 

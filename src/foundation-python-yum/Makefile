@@ -91,6 +91,7 @@ endif
 		rpm2cpio ../$(SRCPKGNAME) | cpio -idmv && cd ..;		\
 		mv -v content/* ../../SOURCES;					\
 		rm -rf content;							\
+		cp yum-foundation-python--makefile.patch ../../SOURCES; \
 	)
 #	spec file is created separately from foundation-firstboot.spec.in
 

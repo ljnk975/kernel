@@ -1,5 +1,5 @@
 %define move_yum_conf_back 1
-%define auto_sitelib 1
+%define auto_sitelib 0
 %define yum_updatesd 0
 %define disable_check 0
 %define yum_cron_systemd 1
@@ -16,7 +16,7 @@
 
 %if %{auto_sitelib}
 
-%{!?python_sitelib: %define python_sitelib %(python -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
+%{!?python_sitelib: %define python_sitelib %(/opt/rocks/bin/python -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
 %else
 %define python_sitelib /opt/rocks/lib/python?.?/site-packages
@@ -195,6 +195,7 @@ Patch369: BZ-1778763-fix-typo-sig_typ-sig_type.patch
 Patch370: BZ-1778784-check-for-revoked-subkeys-before-checking-the-signature.patch
 
 Patch1000: centos-branding-yum.patch
+Patch1001: yum-foundation-python--makefile.patch
 
 URL: http://yum.baseurl.org/
 BuildArchitectures: noarch
@@ -470,11 +471,13 @@ Install this package if you want auto yum updates nightly via cron.
 
 %patch1000 -p1
 
+%patch1001 -p1
+
 # Do distro config. changes after everything else.
 %patch1 -p1
 
 %build
-make
+make PYTHON=/opt/rocks/bin/python
 
 #%if !%{disable_check}
 #%check
