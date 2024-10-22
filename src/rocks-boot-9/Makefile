@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.2 2012/11/27 00:49:01 phil Exp $
+# $Id: Makefile,v 1.3 2012/11/27 00:49:07 phil Exp $
 #
 # @Copyright@
 # 
@@ -56,34 +56,46 @@
 # @Copyright@
 #
 #
-# $Log: Makefile,v $
-# Revision 1.2  2012/11/27 00:49:01  phil
-# Copyright Storm for Emerald Boa
 #
-# Revision 1.1  2012/09/30 21:58:56  phil
-# Update openmpi to 1.6.2.
-# Create Modules for ethernet and IB
-# Add IB support - packages, openmpi configuration, udev rules
 #
 
-PKGROOT = /usr/share/Modules/modulefiles
-REDHAT.ROOT = $(CURDIR)/../../
-
+REDHAT.ROOT     = $(CURDIR)/../../
 -include $(ROCKSROOT)/etc/Rules.mk
 include Rules.mk
 
-MODULESFILES = opt-devel
+LORAXBUILD = loraxtmp
+LORAXCONF = lorax.conf
+ISOCONFIG = usr/share/lorax/config_files/x86/isolinux.cfg 
+# APPENDLINE = central=$(CENTRAL)
+# CENTRAL now may contain slashes, do escaping correctly.
+APPENDLINE = central=$(shell echo $(CENTRAL) | sed 's/\//\\\//g')
+build:
+	## create a local rocks distribution
+	/opt/rocks/bin/rocks create distro
+	## Get the current lorax RPM and install the templates from it
+	rpm2cpio `find rocks-dist -name 'lorax*$(ARCH).rpm'` | cpio --extract -c --make-directories '*/usr/share/lorax/*'
+	## Apply Our patches to the template
+	(cd patch-files; $(TAR) cf - *) | $(TAR) xvf - 
+	## Patch the isolinux.cfg to set up our central
+	$(SED) -i -e '/append/s/$$/ $(APPENDLINE)/' $(ISOCONFIG)
+	echo "[lorax]" > $(LORAXCONF)
+	echo "sharedir=`pwd`/usr/share/lorax" >> $(LORAXCONF)
+	## Create a local repo of THIS roll's RPMS
+	$(MAKE) -C $(REDHAT.ROOT) createlocalrepo
+	## Use Lorax to Build images
+	lorax --nomacboot --rootfs-size 4 $(ISFINAL) -p Rocks -v $(ROCKS_VERSION) -r $(RELEASE) -s `pwd`/rocks-dist/$(ARCH) -s $(REDHAT.ROOT)/localrepo -c `pwd`/$(LORAXCONF) --noupgrade `pwd`/$(LORAXBUILD) 
 
-%: %.in
-	$(SED) $(SEDSCRIPT) $^ > $@
 
-build: $(MODULESFILES)
-
-install:: $(MODULESFILES)
+showvars:
+	echo "CENTRAL=" $(CENTRAL)
+install::
 	mkdir -p $(ROOT)/$(PKGROOT)
-	install -m 755 $(MODULESFILES) $(ROOT)/$(PKGROOT)
+	(cd $(LORAXBUILD); $(TAR) cf - --exclude=boot.iso * ) | \
+	(cd $(ROOT)/$(PKGROOT); $(TAR) xvf - )	
+	(cd $(LORAXBUILD)/images; mv boot.iso $(REDHAT.ROOT)$(INSTALLERISO))
 
 clean::
-	rm -rf $(NAME).spec.in
-	rm -rf $(MODULESFILES)
+	- /bin/rm -rf rocks-dist usr
+	- /bin/rm -f *rpm 
+	- /bin/rm -f $(INSTALLERISO) 
 
