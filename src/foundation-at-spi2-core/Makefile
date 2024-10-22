@@ -1,8 +1,5 @@
-#!/bin/sh
 #
-# This file should remain OS independent
-#
-# $Id: bootstrap.sh,v 1.6 2012/11/27 00:49:04 phil Exp $
+# $Id: Makefile,v 1.3 2012/11/27 00:49:07 phil Exp $
 #
 # @Copyright@
 # 
@@ -58,52 +55,44 @@
 # 
 # @Copyright@
 #
-# $Log: bootstrap.sh,v $
-# Revision 1.6  2012/11/27 00:49:04  phil
-# Copyright Storm for Emerald Boa
 #
-# Revision 1.5  2012/05/06 05:49:13  phil
-# Copyright Storm for Mamba
 #
-# Revision 1.4  2012/03/02 07:11:29  phil
-# reflect name change to foundation-sqlite
-#
-# Revision 1.3  2012/02/28 05:03:57  phil
-# Add build of sqlite
-#
-# Revision 1.2  2011/07/23 02:31:14  phil
-# Viper Copyright
-#
-# Revision 1.1  2011/04/07 17:08:11  phil
-# Tracker needs fcgi installed before it will build
 #
 
-if [ ! -f "$ROLLSROOT/../../bin/get_sources.sh" ]; then
-	echo "To compile this roll on Rocks 6.1.1 or older you need to install a newer rocks-devel rpm.
-Install it with:
-rpm -Uvh https://googledrive.com/host/0B0LD0shfkvCRRGtadUFTQkhoZWs/rocks-devel-6.2-3.x86_64.rpm
-If you need an older version of this roll you can get it from:
-https://github.com/rocksclusters-attic"
-	exit 1
-fi
-
-. $ROLLSROOT/etc/bootstrap-functions.sh || exit 1
+REDHAT.ROOT     = $(CURDIR)/../../
+HTTPGET         = $(ROCKSROOT)/bin/httpget.sh
+-include $(ROCKSROOT)/etc/Rules.mk
+include Rules.mk
 
 
-# prerequisites for foundation-anaconda
-compile_and_install foundation-devel-module
-compile_and_install foundation-glib2
-compile_and_install foundation-gdk-pixbuf2
-compile_and_install foundation-atk
-compile_and_install foundation-at-spi2-core
-compile_and_install foundation-at-spi2-atk
-compile_and_install foundation-gtk+
-compile_and_install foundation-glade
-compile_and_install foundation-libxklavier
-compile_and_install foundation-libcroco
-compile_and_install foundation-librsvg
+build:
+# ROCKS8 - bump to 2.26.2 (same as on Rocky8)
+# https://download.gnome.org/sources/at-spi2-core/2.26/at-spi2-core-2.26.2.tar.xz
+ifeq ($(shell ! test -f $(TARFILE) && echo -n yes),yes)
+	@echo "ROCKS8: Sideloading $(TARFILE)."
+	$(HTTPGET) -B https://download.gnome.org -F sources/at-spi2-core/2.26 -n $(TARFILE)
+endif
+	unxz -c $(TARFILE) | $(TAR) xvf - 
+	(								\
+		cd $(SUBDIR) ; 						\
+		PKG_CONFIG_PATH=/opt/rocks/lib/pkgconfig:$$PKG_CONFIG_PATH	\
+		./configure --prefix=$(PKGROOT) ;			\
+		$(MAKE) ; 						\
+	)
 
-compile fastcgi
-install foundation-fcgi
-compile sqlite 
-install foundation-sqlite
+install::
+	mkdir -p $(ROOT)/$(PKGROOT)
+	(								\
+		cd $(SUBDIR);						\
+		$(MAKE) prefix=$(ROOT)/$(PKGROOT) install;		\
+	)
+	( 								\
+		for f in `find $(ROOT) -name '*py'`; do 		\
+			sed -i -e 's#$(ROOT)##g' $$f;			\
+		done							\
+	)
+	
+clean::
+	rm -rf $(SUBDIR)
+	rm -f $(NAME).spec.in
+
