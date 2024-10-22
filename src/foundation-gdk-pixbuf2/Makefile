@@ -76,6 +76,7 @@ endif
 	(								\
 		cd $(SUBDIR) ; 						\
 		PKG_CONFIG_PATH=/opt/rocks/lib/pkgconfig:$$PKG_CONFIG_PATH	\
+		LD_LIBRARY_PATH=/opt/rocks/lib \
 		./configure --prefix=$(PKGROOT) --enable-gtk-doc-html=no --with-x11;	\
 		$(MAKE);						\
 	)
