@@ -190,7 +190,7 @@ verifyRpmPackage(char *filename)
     rpmcliConfigured();
     //creating query set
     rpmVerifyFlags verifyFlags =
-        (VERIFY_MD5|VERIFY_DIGEST);
+        (VERIFY_ALL);
     verifyFlags &= ~ka->qva_flags;
     ka->qva_flags = (rpmQueryFlags) verifyFlags;
 
