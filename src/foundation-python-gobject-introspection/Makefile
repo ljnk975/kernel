@@ -1,8 +1,5 @@
-#!/bin/sh
-#
-# This file should remain OS independent
-#
-# $Id: bootstrap.sh,v 1.6 2012/11/27 00:49:04 phil Exp $
+# --------------------------------------------------- -*- Makefile -*- --
+# $Id: Makefile,v 1.3 2012/11/27 00:48:37 phil Exp $
 #
 # @Copyright@
 # 
@@ -58,61 +55,47 @@
 # 
 # @Copyright@
 #
-# $Log: bootstrap.sh,v $
-# Revision 1.6  2012/11/27 00:49:04  phil
+# $Log: Makefile,v $
+# Revision 1.3  2012/11/27 00:48:37  phil
 # Copyright Storm for Emerald Boa
 #
-# Revision 1.5  2012/05/06 05:49:13  phil
+# Revision 1.2  2012/05/06 05:48:43  phil
 # Copyright Storm for Mamba
 #
-# Revision 1.4  2012/03/02 07:11:29  phil
-# reflect name change to foundation-sqlite
+# Revision 1.1  2012/02/01 20:42:59  phil
+# Setuptools needed for MYSQL-python build on Rocks v. 6
 #
-# Revision 1.3  2012/02/28 05:03:57  phil
-# Add build of sqlite
-#
-# Revision 1.2  2011/07/23 02:31:14  phil
-# Viper Copyright
-#
-# Revision 1.1  2011/04/07 17:08:11  phil
-# Tracker needs fcgi installed before it will build
 #
 
-if [ ! -f "$ROLLSROOT/../../bin/get_sources.sh" ]; then
-	echo "To compile this roll on Rocks 6.1.1 or older you need to install a newer rocks-devel rpm.
-Install it with:
-rpm -Uvh https://googledrive.com/host/0B0LD0shfkvCRRGtadUFTQkhoZWs/rocks-devel-6.2-3.x86_64.rpm
-If you need an older version of this roll you can get it from:
-https://github.com/rocksclusters-attic"
-	exit 1
-fi
+PKGROOT		= /opt/rocks
+REDHAT.ROOT     = $(CURDIR)/../../
+HTTPGET         = $(ROCKSROOT)/bin/httpget.sh
+-include $(ROCKSROOT)/etc/Rules.mk
+include Rules.mk
 
-. $ROLLSROOT/etc/bootstrap-functions.sh || exit 1
 
-# for foundation-python-report
-install asciidoc python3-devel
+build:
+# ROCKS8: Need to relocate from foundation-python-extras due to pygtk build dependencies
+# ROCKS8: Bump to version 1.56.1 (same as on Rocky8)
+# https://download.gnome.org/sources/gobject-introspection/1.56/gobject-introspection-1.56.1.tar.xz
+ifeq ($(shell ! test -f $(PYPKGNAME)-$(VERSION).tar.xz && echo -n yes),yes)
+	@echo "ROCKS8: Sideloading $(PYPKGNAME)-$(VERSION).tar.gz."
+	$(HTTPGET) -B https://download.gnome.org -F sources/gobject-introspection/1.56 -n $(PYPKGNAME)-$(VERSION).tar.xz
+endif
+	unxz -c $(PYPKGNAME)-$(VERSION).tar.xz | $(TAR) -xf -
+	(									\
+		cd $(PYPKGNAME)-$(VERSION);					\
+		PATH=/opt/rocks/bin:$$PATH ./configure --prefix=$(PKGROOT);	\
+		$(MAKE);							\
+	)
 
-# prerequisites for foundation-anaconda
-compile_and_install foundation-devel-module
-compile_and_install foundation-glib2
-compile_and_install foundation-gdk-pixbuf2
-compile_and_install foundation-atk
-compile_and_install foundation-at-spi2-core
-compile_and_install foundation-at-spi2-atk
-compile_and_install foundation-pango
-compile_and_install foundation-gtk+
-compile_and_install foundation-glade
-compile_and_install foundation-libglade
-compile_and_install foundation-libxklavier
-compile_and_install foundation-libcroco
-compile_and_install foundation-librsvg
-# prerequisites for foundation-libtimezonemap
-compile_and_install foundation-libsoup
-# prerequisites for foundation-python-pygtk
-compile_and_install foundation-python-gobject-introspection
-compile_and_install foundation-pygobject
+install::
+	(									\
+		cd $(PYPKGNAME)-$(VERSION);					\
+		$(MAKE) prefix=$(ROOT)/$(PKGROOT) install;			\
+		mkdir -p $(ROOT)/$(PKGROOT)/share/gir-1.0;			\
+		install -c -m 644 gir/DBus-1.0.gir gir/DBusGLib-1.0.gir gir/fontconfig-2.0.gir gir/freetype2-2.0.gir gir/GL-1.0.gir gir/libxml2-2.0.gir gir/xft-2.0.gir gir/xlib-2.0.gir gir/xfixes-4.0.gir gir/xrandr-1.3.gir gir/win32-1.0.gir gir/cairo-1.0.gir GLib-2.0.gir GObject-2.0.gir GModule-2.0.gir Gio-2.0.gir GIRepository-2.0.gir $(ROOT)/$(PKGROOT)/share/gir-1.0;	\
+	)
 
-compile fastcgi
-install foundation-fcgi
-compile sqlite 
-install foundation-sqlite
+clean::
+	rm -rf $(PYPKGNAME)-$(VERSION)

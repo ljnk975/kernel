@@ -1,8 +1,5 @@
-#!/bin/sh
-#
-# This file should remain OS independent
-#
-# $Id: bootstrap.sh,v 1.6 2012/11/27 00:49:04 phil Exp $
+# --------------------------------------------------- -*- Makefile -*- --
+# $Id: Makefile,v 1.3 2012/11/27 00:48:37 phil Exp $
 #
 # @Copyright@
 # 
@@ -58,61 +55,67 @@
 # 
 # @Copyright@
 #
-# $Log: bootstrap.sh,v $
-# Revision 1.6  2012/11/27 00:49:04  phil
+# $Log: Makefile,v $
+# Revision 1.3  2012/11/27 00:48:37  phil
 # Copyright Storm for Emerald Boa
 #
-# Revision 1.5  2012/05/06 05:49:13  phil
+# Revision 1.2  2012/05/06 05:48:43  phil
 # Copyright Storm for Mamba
 #
-# Revision 1.4  2012/03/02 07:11:29  phil
-# reflect name change to foundation-sqlite
+# Revision 1.1  2012/02/01 20:42:59  phil
+# Setuptools needed for MYSQL-python build on Rocks v. 6
 #
-# Revision 1.3  2012/02/28 05:03:57  phil
-# Add build of sqlite
-#
-# Revision 1.2  2011/07/23 02:31:14  phil
-# Viper Copyright
-#
-# Revision 1.1  2011/04/07 17:08:11  phil
-# Tracker needs fcgi installed before it will build
 #
 
-if [ ! -f "$ROLLSROOT/../../bin/get_sources.sh" ]; then
-	echo "To compile this roll on Rocks 6.1.1 or older you need to install a newer rocks-devel rpm.
-Install it with:
-rpm -Uvh https://googledrive.com/host/0B0LD0shfkvCRRGtadUFTQkhoZWs/rocks-devel-6.2-3.x86_64.rpm
-If you need an older version of this roll you can get it from:
-https://github.com/rocksclusters-attic"
-	exit 1
-fi
+PKGROOT		= /opt/rocks
+REDHAT.ROOT     = $(CURDIR)/../../
+HTTPGET         = $(ROCKSROOT)/bin/httpget.sh
+-include $(ROCKSROOT)/etc/Rules.mk
+include Rules.mk
 
-. $ROLLSROOT/etc/bootstrap-functions.sh || exit 1
 
-# for foundation-python-report
-install asciidoc python3-devel
+build::
+# ROCKS8: Need to relocate from foundation-python-extras due to pygtk build dependencies
+# https://gitlab.gnome.org/GNOME/pygobject/-/blob/master/NEWS: 3.36.1 is last 
+# release supporting Python 2.
+# https://download.gnome.org/sources/pygobject/3.36/pygobject-3.36.1.tar.xz
+# Note 3.36 throws an error with foundation-blivet:
+# AttributeError: 'gi.repository.BlockDev' object has no attribute 'plugin_specs_from_names'
+# Trying last 2.x version (also same on Rocky8)
+# https://download.gnome.org/sources/pygobject/2.28/pygobject-2.28.7.tar.xz
+# Same error - rrot cause were missing python-blockdev bindings. Switching back to 3.36.1, because
+# pygobject-2.28.7 does not compile with gobject-introspection
+#
+# Trying pygobject-2.28.7 again with following simple patch due to problems with
+# foundation-NetworkManager https://mail-index.netbsd.org/pkgsrc-users/2012/02/08/msg015675.html
+#
+# Again switching back to Centos7 Version https://download.gnome.org/sources/pygobject/3.22/pygobject-3.22.0.tar.xz
+# due to anaconda problems with
+# File "/opt/rocks/lib/python2.7/site-packages/gi/overrides/GLib.py", line 99, in _create_tuple
+#    builder = GLib.VariantBuilder()
+# MemoryError
+# 3.22 does not compile! 3.29 compiles.
+ifeq ($(shell ! test -f $(PYPKGNAME)-$(VERSION).tar.gz && echo -n yes),yes)
+	@echo "ROCKS9: Sideloading $(PYPKGNAME)-$(VERSION).tar.xz."
+	$(HTTPGET) -B https://download.gnome.org -F sources/pygobject/2.28 -n $(PYPKGNAME)-$(VERSION).tar.xz
+endif
+	unxz -c $(PYPKGNAME)-$(VERSION).tar.xz | $(TAR) -xf -
+	-cd patch-files && find . -type f | grep -v CVS | cpio -pduv ../
+	(									\
+		cd $(PYPKGNAME)-$(VERSION);					\
+		PYTHON=$(PY.PATH)						\
+		PKG_CONFIG_PATH=/opt/rocks/lib/pkgconfig:$$PKG_CONFIG_PATH 	\
+		LD_LIBRARY_PATH=/opt/rocks/lib \
+		./configure --prefix=$(PKGROOT) --enable-introspection;		\
+		$(MAKE);							\
+	)
 
-# prerequisites for foundation-anaconda
-compile_and_install foundation-devel-module
-compile_and_install foundation-glib2
-compile_and_install foundation-gdk-pixbuf2
-compile_and_install foundation-atk
-compile_and_install foundation-at-spi2-core
-compile_and_install foundation-at-spi2-atk
-compile_and_install foundation-pango
-compile_and_install foundation-gtk+
-compile_and_install foundation-glade
-compile_and_install foundation-libglade
-compile_and_install foundation-libxklavier
-compile_and_install foundation-libcroco
-compile_and_install foundation-librsvg
-# prerequisites for foundation-libtimezonemap
-compile_and_install foundation-libsoup
-# prerequisites for foundation-python-pygtk
-compile_and_install foundation-python-gobject-introspection
-compile_and_install foundation-pygobject
+install::
+	mkdir -p $(ROOT)/$(PKGROOT)
+	(								\
+		cd $(PYPKGNAME)-$(VERSION);				\
+		$(MAKE) prefix=$(ROOT)/$(PKGROOT) install;		\
+	)
 
-compile fastcgi
-install foundation-fcgi
-compile sqlite 
-install foundation-sqlite
+clean::
+	rm -rf $(PYPKGNAME)-$(VERSION)

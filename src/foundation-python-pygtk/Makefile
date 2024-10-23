@@ -1,8 +1,5 @@
-#!/bin/sh
-#
-# This file should remain OS independent
-#
-# $Id: bootstrap.sh,v 1.6 2012/11/27 00:49:04 phil Exp $
+# --------------------------------------------------- -*- Makefile -*- --
+# $Id: Makefile,v 1.7 2012/11/27 00:48:37 phil Exp $
 #
 # @Copyright@
 # 
@@ -58,61 +55,37 @@
 # 
 # @Copyright@
 #
-# $Log: bootstrap.sh,v $
-# Revision 1.6  2012/11/27 00:49:04  phil
-# Copyright Storm for Emerald Boa
-#
-# Revision 1.5  2012/05/06 05:49:13  phil
-# Copyright Storm for Mamba
-#
-# Revision 1.4  2012/03/02 07:11:29  phil
-# reflect name change to foundation-sqlite
-#
-# Revision 1.3  2012/02/28 05:03:57  phil
-# Add build of sqlite
-#
-# Revision 1.2  2011/07/23 02:31:14  phil
-# Viper Copyright
-#
-# Revision 1.1  2011/04/07 17:08:11  phil
-# Tracker needs fcgi installed before it will build
-#
 
-if [ ! -f "$ROLLSROOT/../../bin/get_sources.sh" ]; then
-	echo "To compile this roll on Rocks 6.1.1 or older you need to install a newer rocks-devel rpm.
-Install it with:
-rpm -Uvh https://googledrive.com/host/0B0LD0shfkvCRRGtadUFTQkhoZWs/rocks-devel-6.2-3.x86_64.rpm
-If you need an older version of this roll you can get it from:
-https://github.com/rocksclusters-attic"
-	exit 1
-fi
+PKGROOT		= /opt/rocks
+REDHAT.ROOT     = $(CURDIR)/../../
+HTTPGET         = $(ROCKSROOT)/bin/httpget.sh
+-include $(ROCKSROOT)/etc/Rules.mk
+include Rules.mk
 
-. $ROLLSROOT/etc/bootstrap-functions.sh || exit 1
+build::
+# ROCKS8: Bump to version 2.24.0 (same as on Rocky8)
+# https://download.gnome.org/sources/pygtk/2.24/pygtk-2.24.0.tar.gz
+ifeq ($(shell ! test -f pygtk-$(VERSION).tar.gz && echo -n yes),yes)
+	@echo "ROCKS8: Sideloading pygtk-$(VERSION).tar.gz."
+	$(HTTPGET) -B https://download.gnome.org -F sources/pygtk/2.24 -n pygtk-$(VERSION).tar.gz
+endif
+	gunzip -c pygtk-$(VERSION).tar.gz | $(TAR) -xf -
+	-cd patch-files && find . -type f | grep -v CVS | cpio -pduv ../
+	(								\
+		cd pygtk-$(VERSION);				\
+		PATH=/opt/rocks/bin:$$PATH				\
+		PKG_CONFIG_PATH=/opt/rocks/lib/pkgconfig:$$PKG_CONFIG_PATH     \
+		LD_LIBRARY_PATH=/opt/rocks/lib \
+		./configure --prefix=$(PKGROOT);		\
+		$(MAKE) -j$(nproc);						\
+	)
+	
+install::
+	(								\
+		cd pygtk-$(VERSION);				\
+		$(MAKE) prefix=$(ROOT)/$(PKGROOT) install;		\
+	)
 
-# for foundation-python-report
-install asciidoc python3-devel
 
-# prerequisites for foundation-anaconda
-compile_and_install foundation-devel-module
-compile_and_install foundation-glib2
-compile_and_install foundation-gdk-pixbuf2
-compile_and_install foundation-atk
-compile_and_install foundation-at-spi2-core
-compile_and_install foundation-at-spi2-atk
-compile_and_install foundation-pango
-compile_and_install foundation-gtk+
-compile_and_install foundation-glade
-compile_and_install foundation-libglade
-compile_and_install foundation-libxklavier
-compile_and_install foundation-libcroco
-compile_and_install foundation-librsvg
-# prerequisites for foundation-libtimezonemap
-compile_and_install foundation-libsoup
-# prerequisites for foundation-python-pygtk
-compile_and_install foundation-python-gobject-introspection
-compile_and_install foundation-pygobject
-
-compile fastcgi
-install foundation-fcgi
-compile sqlite 
-install foundation-sqlite
+clean::
+	rm -rf pygtk-$(VERSION)

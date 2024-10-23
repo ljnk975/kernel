@@ -1,0 +1,9 @@
+SRCPKGHOST 	= https://download.gnome.org
+SRCPKGPATH 	= sources/libglade/2.6
+NAME		= foundation-libglade
+PKGROOT		= /opt/rocks
+VERSION		= 2.6.4
+RELEASE		= 0
+SUBDIR		= libglade-$(VERSION)
+TARFILE		= $(SUBDIR).tar.gz
+RPM.FILES	= "$(PKGROOT)/bin/*\\n$(PKGROOT)/lib/*\\n$(PKGROOT)/include/*\\n$(PKGROOT)/share/*"

@@ -1,0 +1,5 @@
+%_topdir /home/linhnv57/rocks/src/roll/kernel/src/foundation-python-gobject-introspection/../../
+%_buildrootdir /home/linhnv57/rocks/src/roll/kernel/src/foundation-python-gobject-introspection/foundation-python-gobject-introspection.buildroot
+%buildroot /home/linhnv57/rocks/src/roll/kernel/src/foundation-python-gobject-introspection/foundation-python-gobject-introspection.buildroot
+%_var	/var
+%debug_package	%{nil}
