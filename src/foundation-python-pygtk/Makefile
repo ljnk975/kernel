@@ -77,7 +77,7 @@ endif
 		PKG_CONFIG_PATH=/opt/rocks/lib/pkgconfig:$$PKG_CONFIG_PATH     \
 		LD_LIBRARY_PATH=/opt/rocks/lib \
 		./configure --prefix=$(PKGROOT);		\
-		$(MAKE) -j$(nproc);						\
+		$(MAKE);						\
 	)
 	
 install::

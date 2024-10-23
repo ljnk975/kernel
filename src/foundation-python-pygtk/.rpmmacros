@@ -1,5 +1,0 @@
-%_topdir /home/linhnv57/rocks/src/roll/kernel/src/foundation-python-pygtk/../../
-%_buildrootdir /home/linhnv57/rocks/src/roll/kernel/src/foundation-python-pygtk/foundation-python-pygtk.buildroot
-%buildroot /home/linhnv57/rocks/src/roll/kernel/src/foundation-python-pygtk/foundation-python-pygtk.buildroot
-%_var	/var
-%debug_package	%{nil}
