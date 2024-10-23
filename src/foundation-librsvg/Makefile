@@ -86,13 +86,6 @@ install::
 	(								\
 		cd $(SUBDIR);						\
 		$(MAKE) prefix=$(ROOT)/$(PKGROOT) install;		\
-		rm -rf $(ROOT)/$(PKGROOT)/bin;				\
-		rm -rf $(ROOT)/$(PKGROOT)/include;			\
-		rm -rf $(ROOT)/$(PKGROOT)/lib/*.so;			\
-		rm -rf $(ROOT)/$(PKGROOT)/lib/pkgconfig;		\
-		rm -rf $(ROOT)/$(PKGROOT)/share/gir-1.0;		\
-		rm -rf $(ROOT)/$(PKGROOT)/share/gtk-doc;		\
-		rm -rf $(ROOT)/$(PKGROOT)/share/man;			\
 	)
 
 clean::

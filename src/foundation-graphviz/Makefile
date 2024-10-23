@@ -144,9 +144,31 @@
 
 PKGROOT		= /opt/rocks
 REDHAT.ROOT     = $(CURDIR)/../../
-ROCKSROOT       = ../devel/devel
+HTTPGET         = $(ROCKSROOT)/bin/httpget.sh
 -include $(ROCKSROOT)/etc/Rules.mk
 include Rules.mk
+
+# ROCKS9
+# https://repo.almalinux.org/vault/9.4/AppStream/Source/Packages/graphviz-2.44.0-26.el9.src.rpm
+build:
+ifeq ($(shell ! test -f $(SRCPKGNAME) && echo -n yes),yes)
+	@echo "ROCKS9: Sideloading $(SRCPKGNAME)."
+	$(HTTPGET) -B https://repo.almalinux.org -F vault/9.4/AppStream/Source/Packages -n $(SRCPKGNAME)
+endif
+	(								\
+		mkdir content && cd content;				\
+		rpm2cpio ../$(SRCPKGNAME) | cpio -idmv;			\
+		mv graphviz-$(VERSION).tar.bz2 ../ && cd ..;		\
+		tar xf graphviz-$(VERSION).tar.bz2;			\
+		cd graphviz-$(VERSION);				\
+		PATCHES=`ls ../content/*.patch`;			\
+		for pat in $$PATCHES; do patch -p1 < $$pat; done;	\
+		./autogen.sh;						\
+		autoconf;						\
+		./configure --prefix=$(PKGROOT) \
+		--enable-perl=no --enable-python=no;\
+		$(MAKE);			\
+	)
 
 install::
 	export LD_LIBRARY_PATH=$(ROOT)/$(PKGROOT)/lib/graphviz

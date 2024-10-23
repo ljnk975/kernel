@@ -1,4 +1,5 @@
 NAME	= foundation-graphviz
-VERSION = 2.28.0
-RELEASE = 0
-RPM.FILES = "/opt/rocks/bin/*\\n/opt/rocks/include/graphviz\\n/opt/rocks/lib/graphviz\\n/opt/rocks/lib/lib*\\n/opt/rocks/lib/pkgconfig/*\\n/opt/rocks/share/graphviz\\n/opt/rocks/share/man/man[137]/*"
+VERSION = 2.44.0
+RELEASE = 26
+RPM.FILES = "/opt/rocks/bin/*\\n/opt/rocks/include/*\\n/opt/rocks/lib/*\\n/opt/rocks/share/*"
+SRCPKGNAME = graphviz-$(VERSION)-$(RELEASE).el9.src.rpm

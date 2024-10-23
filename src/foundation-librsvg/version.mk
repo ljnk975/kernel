@@ -6,4 +6,4 @@ VERSION		= 2.42.9
 RELEASE		= 0
 SUBDIR		= librsvg-$(VERSION)
 TARFILE		= $(SUBDIR).tar.xz
-RPM.FILES	= "$(PKGROOT)/lib/*\\n$(PKGROOT)/share/*"
+RPM.FILES	= "$(PKGROOT)/lib/*\\n$(PKGROOT)/share/*\\n$(PKGROOT)/bin/*\\n$(PKGROOT)/include/*"
