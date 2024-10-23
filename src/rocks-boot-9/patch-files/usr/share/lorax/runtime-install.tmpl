@@ -179,7 +179,7 @@ installpkg spice-vdagent
 installpkg rocks-sql
 installpkg lighttpd
 installpkg anaconda-rocks
-#installpkg rocks-tracker
+installpkg rocks-tracker
 installpkg rocks-gen
 
 # core
@@ -253,6 +253,7 @@ installpkg perl-interpreter
 # kernel
 installpkg foundation-anaconda
 installpkg foundation-atk
+installpkg foundation-at-spi2-core
 installpkg foundation-at-spi2-atk
 installpkg foundation-firstboot
 installpkg foundation-gdk-pixbuf2
@@ -261,25 +262,31 @@ installpkg foundation-glib2
 installpkg foundation-gtk+
 installpkg foundation-json-glib
 installpkg foundation-keybinder
+installpkg foundation-libglade
 installpkg foundation-libcanberra
 installpkg foundation-libgnomekbd
+installpkg foundation-libcroco
 installpkg foundation-librsvg
-#installpkg foundation-libtimezonemap
+installpkg foundation-libsoup
+installpkg foundation-libtimezonemap
 installpkg foundation-libxklavier
 installpkg foundation-PackageKit
 installpkg foundation-pysqlite
+installpkg foundation-python-numpy
+installpkg foundation-python-pygtk
 installpkg foundation-python-report
 installpkg foundation-python-yum
-  
+
 ## Rocks dracut modules for modifying initrd
 installpkg anaconda-rocks-dracut
-  
+
 # fixups? Somehow missing
 installpkg adwaita-gtk2-theme
 installpkg yelp
 installpkg openldap
 installpkg filesystem
 installpkg gtk3 json-glib at-spi2-atk libcanberra-gtk3
+installpkg libsoup
 ## END ROCKS
 
 ## actually install all the requested packages
