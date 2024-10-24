@@ -37,7 +37,7 @@ log = logging.getLogger(__name__)
 __all__ = ["RocksRolls"]
 
 class RocksRolls(KickstartService):
-    """The HelloWorld D-Bus service.
+    """The RocksRolls D-Bus service.
 
     This class parses and stores data for the Hello world addon.
     """

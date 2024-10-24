@@ -40,6 +40,7 @@ from org_rocks_rolls.categories.RocksRolls import RocksRollsCategory
 from org_rocks_rolls import RocksEnv
 from pyanaconda.ui.gui import GUIObject
 from pyanaconda.ui.gui.spokes import NormalSpoke
+from pyanaconda.ui.common import FirstbootSpokeMixIn
 from pyanaconda.ui.communication import hubQ
 import thread
 
@@ -58,7 +59,7 @@ CD = 1
 # export only the spoke, no helper functions, classes or constants
 __all__ = ["RocksRollsSpoke"]
 
-class RocksRollsSpoke(NormalSpoke):
+class RocksRollsSpoke(FirstbootSpokeMixIn, NormalSpoke):
     """
     Class for the RocksRolls spoke. This spoke will be in the RocksRollsCategory 
     category and thus on the Summary hub. It is a very simple example of a unit
@@ -98,23 +99,13 @@ class RocksRollsSpoke(NormalSpoke):
     title = N_("_ROCKS ROLLS")
 
     ### methods defined by API ###
-    def __init__(self, data, storage, payload, instclass):
+    def __init__(self, *args, **kwargs):
         """
+        Create the representation of the spoke.
+
         :see: pyanaconda.ui.common.Spoke.__init__
-        :param data: data object passed to every spoke to load/store data
-                     from/to it
-        :type data: pykickstart.base.BaseHandler
-        :param storage: object storing storage-related information
-                        (disks, partitioning, bootloader, etc.)
-        :type storage: blivet.Blivet
-        :param payload: object storing packaging-related information
-        :type payload: pyanaconda.packaging.Payload
-        :param instclass: distribution-specific information
-        :type instclass: pyanaconda.installclass.BaseInstallClass
-
         """
-
-        NormalSpoke.__init__(self, data, storage, payload, instclass)
+        super().__init__(*args, **kwargs)
         r = RocksEnv.RocksEnv()
         self.clientInstall = r.clientInstall
 
@@ -142,7 +133,7 @@ class RocksRollsSpoke(NormalSpoke):
 
         """
 
-        NormalSpoke.initialize(self)
+        super().initialize()
 
         import logging
         self.log = logging.getLogger('anaconda')
@@ -480,12 +471,6 @@ class RocksRollsDialog(GUIObject):
     builderObjects = ["sampleDialog"]
     mainWidgetName = "sampleDialog"
     uiFile = "rocks_rolls.glade"
-
-    def __init__(self, *args):
-        GUIObject.__init__(self, *args)
-
-    def initialize(self):
-        GUIObject.initialize(self)
 
     def run(self):
         """

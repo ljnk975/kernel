@@ -163,24 +163,15 @@ class RocksConfigSpoke(NormalSpoke):
     title = N_("_CLUSTER CONFIG")
 
     ### methods defined by API ###
-    def __init__(self, data, storage, payload, instclass):
+    def __init__(self, *args, **kwargs):
         """
+        Create the representation of the spoke.
+
         :see: pyanaconda.ui.common.Spoke.__init__
-        :param data: data object passed to every spoke to load/store data
-                     from/to it
-        :type data: pykickstart.base.BaseHandler
-        :param storage: object storing storage-related information
-                        (disks, partitioning, bootloader, etc.)
-        :type storage: blivet.Blivet
-        :param payload: object storing packaging-related information
-        :type payload: pyanaconda.packaging.Payload
-        :param instclass: distribution-specific information
-        :type instclass: pyanaconda.installclass.BaseInstallClass
-
         """
-
-        NormalSpoke.__init__(self, data, storage, payload, instclass)
+        super().__init__(*args, **kwargs)
         self.clientInstall = RocksEnv.RocksEnv().clientInstall
+
     def initialize(self):
         """
         The initialize method that is called after the instance is created.
@@ -191,7 +182,7 @@ class RocksConfigSpoke(NormalSpoke):
 
         """
 
-        NormalSpoke.initialize(self)
+        super().initialize()
 
         import logging
         self.log = logging.getLogger('anaconda')

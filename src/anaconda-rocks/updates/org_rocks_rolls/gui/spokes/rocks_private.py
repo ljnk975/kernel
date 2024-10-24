@@ -106,9 +106,15 @@ class RocksPrivateIfaceSpoke(NormalSpoke):
     title = N_("_CLUSTER PRIVATE NETWORK")
 
     ### methods defined by API ###
-    def __init__(self, data, storage, payload, instclass):
-        NormalSpoke.__init__(self, data, storage, payload, instclass)
+    def __init__(self, *args, **kwargs):
+        """
+        Create the representation of the spoke.
+
+        :see: pyanaconda.ui.common.Spoke.__init__
+        """
+        super().__init__(*args, **kwargs)
         self.clientInstall = RocksEnv.RocksEnv().clientInstall
+
     def initialize(self):
         """
         The initialize method that is called after the instance is created.
@@ -119,7 +125,7 @@ class RocksPrivateIfaceSpoke(NormalSpoke):
 
         """
 
-        NormalSpoke.initialize(self)
+        super().initialize()
 
         import logging
         self.log = logging.getLogger('anaconda')
