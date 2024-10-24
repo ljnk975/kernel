@@ -59,20 +59,25 @@
 REDHAT.ROOT     = $(CURDIR)/../../
 -include $(ROCKSROOT)/etc/Rules.mk
 include Rules.mk
+
 IMGDIR=imgroot
 ADDON = org_rocks_rolls
-#ANACONDA_USR = usr
-ANACONDA_USR = opt/rocks
-ANACONDA_SHARE = $(ANACONDA_USR)/share/anaconda/addons
+ADDON_CONF = org.rocks.rolls.conf
+ADDON_SERVICE = org.rocks.rolls.service
+ANACONDA_USR = usr
+ANACONDA_BASEDIR := $(ANACONDA_USR)/share/anaconda
+ANACONDA_ADDONDIR := $(ANACONDA_BASEDIR)/addons
+ANACONDA_SERVICESDIR := $(ANACONDA_BASEDIR)/dbus/services
+ANACONDA_CONFDIR := $(ANACONDA_BASEDIR)/dbus/confs
+CONTAINER_NAME = hello-world-anaconda-addon-ci
 UPDATES	= updates
 PRODUCT = product
 PRODUCT.SRC  = $(PRODUCT)
 UPDATES.IMG = updates.img
 SUBDIRS = $(PRODUCT) $(UPDATES)
-SYS.PYPATH = $(ANACONDA_USR)/lib/python2.7/site-packages
-ROCKS.PYPATH = /opt/rocks/lib/python2.7/site-packages
-#UPDATES_DIRS = opt usr
-UPDATES_DIRS = opt
+#SYS.PYPATH = $(ANACONDA_USR)/lib/python2.7/site-packages
+#ROCKS.PYPATH = /opt/rocks/lib/python2.7/site-packages
+UPDATES_DIRS = opt usr
 PRODUCT_DIR = run 
 
 .PHONY: $(IMGDIR)
@@ -85,8 +90,12 @@ $(UPDATES.IMG): $(IMGDIR)
 
 $(IMGDIR): clean 
 	- mkdir $(IMGDIR)
-	mkdir -p $(IMGDIR)/$(ANACONDA_SHARE) 
-	(cd $(UPDATES); $(TAR) cf - $(ADDON)) | (cd $(IMGDIR)/$(ANACONDA_SHARE); $(TAR) xvf -)
+	mkdir -p $(IMGDIR)/$(ANACONDA_ADDONDIR)
+	mkdir -p $(IMGDIR)/$(ANACONDA_CONFDIR)
+	mkdir -p $(IMGDIR)/$(ANACONDA_SERVICESDIR)
+	cp $(UPDATES)/data/$(ADDON_CONF) $(IMGDIR)/$(ANACONDA_CONFDIR)
+	cp $(UPDATES)/data/$(ADDON_SERVICE) $(IMGDIR)/$(ANACONDA_SERVICESDIR)
+	(cd $(UPDATES); $(TAR) cf - $(ADDON)) | (cd $(IMGDIR)/$(ANACONDA_ADDONDIR); $(TAR) xvf -)
 # 	ROCKS8 - no need to copy xml anymore
 #	mkdir -p $(IMGDIR)/$(SYS.PYPATH)
 #	(cd $(ROCKS.PYPATH); $(TAR) cf - _xmlplus) | (cd $(IMGDIR)/$(SYS.PYPATH); $(TAR) xvf -)

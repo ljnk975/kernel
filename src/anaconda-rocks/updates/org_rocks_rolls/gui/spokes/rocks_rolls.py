@@ -398,9 +398,9 @@ class RocksRollsSpoke(NormalSpoke):
             self.selectStore.remove(iter)
         dialog.destroy()
     def removeSelected(self,a,b,c):
-        print a
-        print b
-        print c
+        print(a)
+        print(b)
+        print(c)
         self.dialog.destroy()
 
     def selectRoll_toggle(self,toggle,idx):
