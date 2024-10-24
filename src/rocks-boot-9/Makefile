@@ -64,22 +64,13 @@ HTTPGET		= $(ROCKSROOT)/bin/httpget.sh
 -include $(ROCKSROOT)/etc/Rules.mk
 include Rules.mk
 
-LORAXRPM = lorax-34.9.25-1.el9.$(ARCH).rpm
 LORAXBUILD = loraxtmp
 LORAXCONF = lorax.conf
-ISOCONFIG = usr/share/lorax/config_files/x86/isolinux.cfg 
+ISOCONFIG = usr/share/lorax/config_files/x86/isolinux.cfg
 # APPENDLINE = central=$(CENTRAL)
 # CENTRAL now may contain slashes, do escaping correctly.
 APPENDLINE = central=$(shell echo $(CENTRAL) | sed 's/\//\\\//g')
 build:
-ifeq ($(shell ! test -f $(LORAXRPM) && echo -n yes),yes)
-	@echo "ROCKS9: Sideloading $(LORAXRPM)."
-	$(HTTPGET) -B https://repo.almalinux.org -F almalinux/9.4/AppStream/$(ARCH)/os/Packages -n $(LORAXRPM)
-endif
-	## Get the current lorax RPM and install the templates from it
-	rpm2cpio $(LORAXRPM) | cpio --extract -c --make-directories '*/usr/share/lorax/*'
-	## Apply Our patches to the template
-	(cd patch-files; $(TAR) cf - *) | $(TAR) xvf - 
 	## Patch the isolinux.cfg to set up our central
 	$(SED) -i -e '/append/s/$$/ $(APPENDLINE)/' $(ISOCONFIG)
 	echo "[lorax]" > $(LORAXCONF)
@@ -101,7 +92,7 @@ install::
 	(cd $(LORAXBUILD)/images; mv boot.iso $(REDHAT.ROOT)$(INSTALLERISO))
 
 clean::
-	- /bin/rm -rf rocks-dist usr
+	- /bin/rm -rf rocks-dist
 	- /bin/rm -f *rpm 
 	- /bin/rm -f $(INSTALLERISO) 
 

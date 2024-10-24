@@ -2,8 +2,8 @@
 <%page args="basearch, product"/>
 
 ## anaconda package
-installpkg foundation-anaconda-dracut foundation-anaconda-widgets foundation-anaconda-tui
-installpkg foundation-anaconda-gui foundation-anaconda-core foundation-anaconda
+installpkg anaconda anaconda-widgets kexec-tools-anaconda-addon anaconda-install-img-deps
+installpkg oscap-anaconda-addon
 installpkg redhat-release-eula
 
 ## FIXME Pull in device-mapper-multipath
@@ -62,8 +62,8 @@ installpkg glibc-all-langpacks
 ## yay, plymouth
 installpkg plymouth
 
-## extra dracut modules (but not anaconda-dracut)
-installpkg dracut-network dracut-config-generic dracut-live
+## extra dracut modules
+installpkg anaconda-dracut dracut-network dracut-config-generic
 
 ## import-state.service for switchroot
 installpkg initscripts
@@ -251,7 +251,6 @@ installpkg perl-version
 installpkg perl-interpreter
 
 # kernel
-installpkg foundation-anaconda
 installpkg foundation-atk
 installpkg foundation-at-spi2-core
 installpkg foundation-at-spi2-atk
